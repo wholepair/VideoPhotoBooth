@@ -1,8 +1,10 @@
 package com.example.videophotobooth2;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.util.Log;
@@ -10,7 +12,11 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+
 import java.security.KeyStore;
+import java.util.ArrayList;
 
 public class MainActivity extends Activity {
     public static final String TAG = "VideoPhotoBooth";
@@ -28,6 +34,8 @@ public class MainActivity extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        checkPermissions();
 
         dataEncryptor = new DataEncryptor();
 
@@ -89,5 +97,28 @@ public class MainActivity extends Activity {
         }
 
         return false;
+    }
+
+    private void checkPermissions() {
+        ArrayList<String> perms = new ArrayList<String>();
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            perms.add(Manifest.permission.READ_EXTERNAL_STORAGE);
+        }
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+            perms.add(Manifest.permission.CAMERA);
+        }
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
+            perms.add(Manifest.permission.RECORD_AUDIO);
+        }
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            perms.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        }
+
+        if (perms.size() > 0) {
+            Log.d(TAG, "Requesting perms: " + perms.toString());
+            String[] permArray = new String[perms.size()];
+            perms.toArray(permArray);
+            ActivityCompat.requestPermissions(this, permArray, 100);
+        }
     }
 }

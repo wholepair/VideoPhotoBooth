@@ -44,8 +44,10 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
+import java.util.concurrent.TimeUnit;
 
 public class VideoRecorder extends AppCompatActivity implements View.OnClickListener {
     private static final String TAG = "VideoPhotoBooth";
@@ -70,19 +72,6 @@ public class VideoRecorder extends AppCompatActivity implements View.OnClickList
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         recorded = false;
-
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO}, 0);
-        }
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, 100);
-        }
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 0);
-        }
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 0);
-        }
 
         setContentView(R.layout.activity_recorder);
 
@@ -168,11 +157,10 @@ public class VideoRecorder extends AppCompatActivity implements View.OnClickList
         cameraProvider.unbindAll();
 
         CameraSelector cameraSelector = new CameraSelector.Builder()
-                .requireLensFacing(CameraSelector.LENS_FACING_BACK)
+                .requireLensFacing(CameraSelector.LENS_FACING_FRONT)
                 .build();
 
         Preview preview = new Preview.Builder().build();
-
         preview.setSurfaceProvider(previewView.getSurfaceProvider());
 
         videoCapture = new VideoCapture.Builder()
@@ -229,6 +217,7 @@ public class VideoRecorder extends AppCompatActivity implements View.OnClickList
             contentValues.put(MediaStore.MediaColumns.MIME_TYPE, "video/mp4");
 
 
+
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
                 // TODO: Consider calling
                 //    ActivityCompat#requestPermissions
@@ -239,6 +228,7 @@ public class VideoRecorder extends AppCompatActivity implements View.OnClickList
                 // for ActivityCompat#requestPermissions for more details.
                 return;
             }
+
             videoCapture.startRecording(
                     new VideoCapture.OutputFileOptions.Builder(
                             getContentResolver(),
@@ -327,6 +317,9 @@ public class VideoRecorder extends AppCompatActivity implements View.OnClickList
         File videoDirOut = getExternalFilesDir(android.os.Environment.DIRECTORY_MOVIES);
         File tempVideoOut = new File(videoDirOut.getPath() + "/tempVideo.mp4");
 
+        while (tempVideoIn.length() == 0) {
+            // Wait for file to be written
+        }
         moveFile(tempVideoIn, tempVideoOut);
     }
 
