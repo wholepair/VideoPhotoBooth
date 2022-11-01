@@ -1,4 +1,4 @@
-package com.richardosgood.videophotobooth2;
+package com.richardosgood.videophotobooth;
 
 import static androidx.constraintlayout.helper.widget.MotionEffect.TAG;
 

@@ -1,4 +1,4 @@
-package com.richardosgood.videophotobooth2;
+package com.richardosgood.videophotobooth;
 
 import static android.os.Environment.DIRECTORY_MOVIES;
 

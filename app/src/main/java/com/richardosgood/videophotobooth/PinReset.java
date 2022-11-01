@@ -1,6 +1,6 @@
-package com.richardosgood.videophotobooth2;
+package com.richardosgood.videophotobooth;
 
-import static com.richardosgood.videophotobooth2.MainActivity.savePin;
+import static com.richardosgood.videophotobooth.MainActivity.savePin;
 
 import android.app.Activity;
 import android.os.Bundle;

@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">VideoPhotoBooth2</string>
+    <string name="app_name">VideoPhotoBooth</string>
     <string name="error_enc_init">Error! Unable to initialize encryption</string>
     <string name="error_enc_pref">Error! Unable to load preferences!</string>
     <string name="main_pin_choose">Please choose an export PIN</string>
