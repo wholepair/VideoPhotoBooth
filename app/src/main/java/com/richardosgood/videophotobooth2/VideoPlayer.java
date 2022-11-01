@@ -1,12 +1,6 @@
-package com.example.videophotobooth2;
+package com.richardosgood.videophotobooth2;
 
-import static android.os.Environment.DIRECTORY_MOVIES;
-
-import android.app.Activity;
-import android.media.session.MediaController;
-import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.view.View;
 import android.widget.Button;
 import android.widget.VideoView;

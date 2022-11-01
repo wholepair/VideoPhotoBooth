@@ -3,11 +3,11 @@ plugins {
 }
 
 android {
-    namespace 'com.example.videophotobooth2'
+    namespace 'com.richardosgood.videophotobooth2'
     compileSdk 32
 
     defaultConfig {
-        applicationId "com.example.videophotobooth2"
+        applicationId 'com.richardosgood.videophotobooth2'
         minSdk 23
         targetSdk 32
         versionCode 1

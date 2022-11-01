@@ -1,4 +1,4 @@
-package com.example.videophotobooth2;
+package com.richardosgood.videophotobooth2;
 
 import android.Manifest;
 import android.app.Activity;

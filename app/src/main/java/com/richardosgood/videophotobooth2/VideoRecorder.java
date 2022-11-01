@@ -1,4 +1,4 @@
-package com.example.videophotobooth2;
+package com.richardosgood.videophotobooth2;
 
 import static android.os.Environment.DIRECTORY_MOVIES;
 
@@ -44,10 +44,8 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
-import java.util.concurrent.TimeUnit;
 
 public class VideoRecorder extends AppCompatActivity implements View.OnClickListener {
     private static final String TAG = "VideoPhotoBooth";

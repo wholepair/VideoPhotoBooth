@@ -1,14 +1,12 @@
-package com.example.videophotobooth2;
+package com.richardosgood.videophotobooth2;
 
 import static androidx.constraintlayout.helper.widget.MotionEffect.TAG;
 
-import android.content.Context;
 import android.content.res.Resources;
 import android.security.keystore.KeyGenParameterSpec;
 import android.security.keystore.KeyProperties;
 import android.util.Base64;
 import android.util.Log;
-import android.widget.Toast;
 
 import java.io.IOException;
 import java.security.InvalidAlgorithmParameterException;
