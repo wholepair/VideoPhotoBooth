@@ -2,6 +2,10 @@ package com.example.videophotobooth2;
 
 import static android.os.Environment.DIRECTORY_MOVIES;
 
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -17,12 +21,12 @@ import androidx.core.content.ContextCompat;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.media.MediaScannerConnection;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
@@ -59,6 +63,8 @@ public class VideoRecorder extends AppCompatActivity implements View.OnClickList
 
     private androidx.camera.core.VideoCapture videoCapture;
     private ImageCapture imageCapture;
+    private String nextAction;
+    private ActivityResultLauncher<Intent> launchCheckPin;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -96,6 +102,27 @@ public class VideoRecorder extends AppCompatActivity implements View.OnClickList
         toolbar.setSubtitle("Video Booth");
         toolbar.inflateMenu(R.menu.options_menu);
 
+        launchCheckPin = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                new ActivityResultCallback<ActivityResult>() {
+                    @Override
+                    public void onActivityResult(ActivityResult result) {
+                        if (result.getResultCode() == Activity.RESULT_OK) {
+                            Intent data = result.getData();
+                            boolean pinResult = data.getBooleanExtra("result", false);
+
+                            if (pinResult == true) {
+                                if (nextAction == "export") {
+                                    exportVideos();
+                                } else if (nextAction == "resetPin") {
+                                    setPin();
+                                }
+                            }
+
+                        }
+                    }
+                });
+
         toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
@@ -103,9 +130,11 @@ public class VideoRecorder extends AppCompatActivity implements View.OnClickList
 
 
                 if (item.getItemId() == R.id.export) {
-                    exportVideos();
+                    nextAction = "export";
+                    launchCheckPin();
                 } else if (item.getItemId() == R.id.setPin) {
-                    setPin();
+                    nextAction = "resetPin";
+                    launchCheckPin();
                 } else {
                     // do something
                 }
@@ -170,7 +199,7 @@ public class VideoRecorder extends AppCompatActivity implements View.OnClickList
                 } else if (bRecording.getText() == "Discard") {
                     discardVideo();
                 } else {
-                    bRecording.setText("Record");
+                    bRecording.setText("Discard");
                     bPlay.setVisibility(View.VISIBLE);
                     bSave.setVisibility(View.VISIBLE);
                     videoCapture.stopRecording();
@@ -307,8 +336,7 @@ public class VideoRecorder extends AppCompatActivity implements View.OnClickList
     }
 
     private void setPin() {
-        Intent pinIntent = new Intent(this, EnterPin.class);
-        pinIntent.putExtra("mode", "checkPin");
+        Intent pinIntent = new Intent(this, PinReset.class);
         startActivity(pinIntent);
     }
 
@@ -331,6 +359,8 @@ public class VideoRecorder extends AppCompatActivity implements View.OnClickList
         File[] files = directory.listFiles();
         Log.d(TAG, "Files: "+ files.length);
 
+        int fileCount = 0;
+
         for (int i = 0; i < files.length; i++)
         {
             String fileName = files[i].getName();
@@ -347,7 +377,16 @@ public class VideoRecorder extends AppCompatActivity implements View.OnClickList
 
             moveFile(videoIn, videoOut);
             scanFile(this, videoOut, "video/mp4");
+            fileCount++;
         }
+        Toast.makeText(VideoRecorder.this, "Exported " + fileCount + " videos to gallery", Toast.LENGTH_SHORT).show();
+    }
+
+    private void launchCheckPin() {
+
+
+        Intent pinIntent = new Intent(this, PinCheck.class);
+        launchCheckPin.launch(pinIntent);
     }
 
     // Must tell MediaStore about the file or it won't show up in gallery until it is eventually scanned
@@ -360,7 +399,7 @@ public class VideoRecorder extends AppCompatActivity implements View.OnClickList
         File tempVideo = new File(videoDir.getPath() + "/tempVideo.mp4");
         tempVideo.delete();
 
-        Toast.makeText(VideoRecorder.this, "Video discarded.", Toast.LENGTH_SHORT).show();
+        Toast.makeText(VideoRecorder.this, "Video discarded", Toast.LENGTH_SHORT).show();
         bRecording.setText("Record");
         bPlay.setVisibility(View.GONE);
         bSave.setVisibility(View.GONE);

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
@@ -8,16 +9,19 @@
         android:id="@+id/editTextPin"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="196dp"
         android:ems="10"
         android:inputType="numberPassword"
-        tools:layout_editor_absoluteX="100dp"
-        tools:layout_editor_absoluteY="196dp" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Enter PIN"
-        tools:layout_editor_absoluteX="174dp"
-        tools:layout_editor_absoluteY="241dp" />
+        app:layout_constraintEnd_toEndOf="@+id/editTextPin"
+        app:layout_constraintStart_toStartOf="@+id/editTextPin"
+        app:layout_constraintTop_toBottomOf="@+id/editTextPin" />
 </androidx.constraintlayout.widget.ConstraintLayout>

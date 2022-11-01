@@ -1,31 +1,19 @@
 package com.example.videophotobooth2;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.security.keystore.KeyGenParameterSpec;
-import android.security.keystore.KeyProperties;
-import android.util.Base64;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import java.io.IOException;
-import java.security.InvalidAlgorithmParameterException;
 import java.security.KeyStore;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.security.cert.CertificateException;
-
-import javax.crypto.Cipher;
-import javax.crypto.KeyGenerator;
-import javax.crypto.spec.GCMParameterSpec;
 
 public class MainActivity extends Activity {
+    public static final String TAG = "VideoPhotoBooth";
     private static final String AndroidKeyStore = "AndroidKeyStore";
     private static final String AES_MODE = "AES/GCM/NoPadding";
     private static final String KEY_ALIAS = "VideoBoothKey";
@@ -45,7 +33,7 @@ public class MainActivity extends Activity {
 
         // Try to open the keystore for storing PIN
         if (!dataEncryptor.initialize()) {
-            Toast.makeText(MainActivity.this, "Error! Unable to initialize encryption", Toast.LENGTH_SHORT).show();
+            Toast.makeText(MainActivity.this, getString(R.string.error_enc_init), Toast.LENGTH_SHORT).show();
             finish();
         }
 
@@ -53,21 +41,22 @@ public class MainActivity extends Activity {
         try {
             prefs = getSharedPreferences("VideoBooth", MODE_PRIVATE);
         } catch (Exception e) {
-            Toast.makeText(MainActivity.this, "Error! Unable to load preferences!!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(MainActivity.this, getString(R.string.error_enc_pref), Toast.LENGTH_SHORT).show();
             finish();
         }
 
         String pin = prefs.getString("PIN", null);
+        //pin = null;
         if (pin == null) {
             // No PIN is set, so require a PIN to be set
+            Toast.makeText(MainActivity.this, getString(R.string.main_pin_choose), Toast.LENGTH_SHORT).show();
             setPin();
         }
 
     }
 
     private void setPin() {
-        Intent pinIntent = new Intent(this, EnterPin.class);
-        pinIntent.putExtra("mode", "setPin");
+        Intent pinIntent = new Intent(this, PinReset.class);
         startActivity(pinIntent);
     }
 
@@ -83,15 +72,18 @@ public class MainActivity extends Activity {
         startActivity(cameraIntent);
     }
 
-    public static void savePin(String pin) throws Exception {
+    public static boolean savePin(String pin) {
         String encryptedPin = dataEncryptor.encryptData(pin.getBytes());
-        prefs.edit().putString("PIN", encryptedPin);
+        if (encryptedPin.equals(null)){
+            return false;
+        }
+        prefs.edit().putString("PIN", encryptedPin).commit();
+        return true;
     }
 
     public static boolean checkPin(String enteredPin) throws Exception {
         String storedPin_encrypted = prefs.getString("PIN", null);
         String storedPin = dataEncryptor.decryptData(storedPin_encrypted);
-
         if (storedPin.equals(enteredPin)) {
             return true;
         }

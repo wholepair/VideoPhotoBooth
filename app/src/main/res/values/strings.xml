@@ -1,3 +1,12 @@
 <resources>
     <string name="app_name">VideoPhotoBooth2</string>
+    <string name="error_enc_init">Error! Unable to initialize encryption</string>
+    <string name="error_enc_pref">Error! Unable to load preferences!</string>
+    <string name="main_pin_choose">Please choose an export PIN</string>
+    <string name="error_enc_encrypt">Unable to encrypt pin!</string>
+    <string name="error_enc_decrypt">Unable to decrypt pin!</string>
+    <string name="error_pin_validate">Error! Unable to validate PIN!</string>
+    <string name="pin_updated">PIN updated</string>
+    <string name="pin_incorrect">Incorrect PIN</string>
+    <string name="pin_nomatch">PINs do not match!</string>
 </resources>

@@ -1,9 +1,13 @@
 package com.example.videophotobooth2;
 
+import static androidx.constraintlayout.helper.widget.MotionEffect.TAG;
+
 import android.content.Context;
+import android.content.res.Resources;
 import android.security.keystore.KeyGenParameterSpec;
 import android.security.keystore.KeyProperties;
 import android.util.Base64;
+import android.util.Log;
 import android.widget.Toast;
 
 import java.io.IOException;
@@ -22,7 +26,7 @@ public class DataEncryptor {
     private static final String AndroidKeyStore = "AndroidKeyStore";
     private static final String AES_MODE = "AES/GCM/NoPadding";
     private static final String KEY_ALIAS = "VideoBoothKey";
-    private static String FIXED_IV = "12345678";
+    private static String FIXED_IV = "123456789012";
     private KeyStore keyStore;
 
     public DataEncryptor() {
@@ -30,6 +34,9 @@ public class DataEncryptor {
     }
 
     public boolean initialize() {
+        if (!openKeystore()) {
+            return false;
+        }
         // Try to get the app's secret key in case it already exists
         try {
             java.security.Key key = getSecretKey();
@@ -77,20 +84,34 @@ public class DataEncryptor {
         return keyStore.getKey(KEY_ALIAS, null);
     }
 
-    public String encryptData(byte[] input) throws Exception {
-        Cipher c = Cipher.getInstance(AES_MODE);
-        c.init(Cipher.ENCRYPT_MODE, getSecretKey(), new GCMParameterSpec(128, FIXED_IV.getBytes()));
-        byte[] encodedBytes = c.doFinal(input);
-        String encryptedBase64Encoded = Base64.encodeToString(encodedBytes, Base64.DEFAULT);
+    public String encryptData(byte[] input) {
+        String encryptedBase64Encoded = null;
+
+        try {
+            Cipher c = Cipher.getInstance(AES_MODE);
+            c.init(Cipher.ENCRYPT_MODE, getSecretKey(), new GCMParameterSpec(128, FIXED_IV.getBytes()));
+            byte[] encodedBytes = c.doFinal(input);
+            encryptedBase64Encoded = Base64.encodeToString(encodedBytes, Base64.DEFAULT);
+        } catch (Exception e) {
+            Log.e(TAG, Resources.getSystem().getString(R.string.error_enc_encrypt));
+        }
         return encryptedBase64Encoded;
     }
 
-    public String decryptData(String encryptedBase64Encoded) throws Exception {
+    public String decryptData(String encryptedBase64Encoded) {
+        String decoded = null;
         byte[] encrypted = Base64.decode(encryptedBase64Encoded, Base64.DEFAULT);
 
-        Cipher c = Cipher.getInstance(AES_MODE);
-        c.init(Cipher.DECRYPT_MODE, getSecretKey(), new GCMParameterSpec(128, FIXED_IV.getBytes()));
-        byte[] decodedBytes = c.doFinal(encrypted);
-        return decodedBytes.toString();
+        try {
+            Cipher c = Cipher.getInstance(AES_MODE);
+            c.init(Cipher.DECRYPT_MODE, getSecretKey(), new GCMParameterSpec(128, FIXED_IV.getBytes()));
+            byte[] decodedBytes = c.doFinal(encrypted);
+            decoded = new String(decodedBytes);
+        } catch (Exception e) {
+            Log.e(TAG, Resources.getSystem().getString(R.string.error_enc_decrypt));
+            return null;
+        }
+
+        return decoded;
     }
 }
