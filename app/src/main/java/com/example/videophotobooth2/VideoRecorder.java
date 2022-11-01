@@ -177,10 +177,7 @@ public class VideoRecorder extends AppCompatActivity implements View.OnClickList
                 }
                 break;
             }
-
         }
-
-
     }
 
     @SuppressLint("RestrictedApi")
@@ -311,6 +308,7 @@ public class VideoRecorder extends AppCompatActivity implements View.OnClickList
 
     private void setPin() {
         Intent pinIntent = new Intent(this, EnterPin.class);
+        pinIntent.putExtra("mode", "checkPin");
         startActivity(pinIntent);
     }
 
@@ -355,5 +353,16 @@ public class VideoRecorder extends AppCompatActivity implements View.OnClickList
     // Must tell MediaStore about the file or it won't show up in gallery until it is eventually scanned
     private void scanFile(Context c, File f, String mimeType) {
         MediaScannerConnection.scanFile(c, new String[] {f.getAbsolutePath()}, new String[] {mimeType}, null);
+    }
+
+    private void discardVideo() {
+        File videoDir = getExternalFilesDir(android.os.Environment.DIRECTORY_MOVIES);
+        File tempVideo = new File(videoDir.getPath() + "/tempVideo.mp4");
+        tempVideo.delete();
+
+        Toast.makeText(VideoRecorder.this, "Video discarded.", Toast.LENGTH_SHORT).show();
+        bRecording.setText("Record");
+        bPlay.setVisibility(View.GONE);
+        bSave.setVisibility(View.GONE);
     }
 }
