@@ -233,13 +233,12 @@ public class VideoRecorder extends AppCompatActivity implements View.OnClickList
                 return;
             }
 
+            File videoDirOut = getExternalFilesDir(TEMP_PATH);
+            videoDirOut.mkdirs();
+            File tempVideoOut = new File(videoDirOut.getPath() + "/" + tempVideoName);
             videoCapture.startRecording(
                     new VideoCapture.OutputFileOptions.Builder(
-                            getContentResolver(),
-                            MediaStore.Video.Media.EXTERNAL_CONTENT_URI,
-                            //MediaStore.Video.Media.INTERNAL_CONTENT_URI,
-                            //Uri.fromFile(getExternalFilesDir(android.os.Environment.DIRECTORY_MOVIES)),
-                            contentValues
+                            tempVideoOut
                     ).build(),
                     getExecutor(),
                     new VideoCapture.OnVideoSavedCallback() {
@@ -309,23 +308,6 @@ public class VideoRecorder extends AppCompatActivity implements View.OnClickList
         this.recorded = true;
         bPlay.setVisibility(View.VISIBLE);
         bSave.setVisibility(View.VISIBLE);
-        moveTempVideoToPrivateStorage();
-    }
-
-    // Move temp video to private app storage
-    // For some reason I couldn't save it there directly
-    private void moveTempVideoToPrivateStorage() {
-        File videoDirIn = Environment.getExternalStoragePublicDirectory(DIRECTORY_MOVIES);
-        File tempVideoIn = new File(videoDirIn.getPath() + "/" + tempVideoName);
-
-        File videoDirOut = getExternalFilesDir(TEMP_PATH);
-        videoDirOut.mkdirs();
-        File tempVideoOut = new File(videoDirOut.getPath() + "/" + tempVideoName);
-
-        while (tempVideoIn.length() == 0) {
-            // Wait for file to be written
-        }
-        moveFile(tempVideoIn, tempVideoOut);
     }
 
     public void playVideo(View view) {
