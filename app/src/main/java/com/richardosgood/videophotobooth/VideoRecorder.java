@@ -2,6 +2,8 @@ package com.richardosgood.videophotobooth;
 
 import static android.os.Environment.DIRECTORY_MOVIES;
 
+import static androidx.camera.view.PreviewView.ScaleType.FIT_CENTER;
+
 import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
@@ -51,19 +53,21 @@ public class VideoRecorder extends AppCompatActivity implements View.OnClickList
     private static final String TAG = "VideoPhotoBooth";
 
     private ListenableFuture<ProcessCameraProvider> cameraProviderFuture;
-    PreviewView previewView;
+    private PreviewView previewView;
 
-    Button bRecording;
-    Button bPlay;
-    Button bSave;
-
-    Toolbar toolbar;
+    private Button bRecording;
+    private Button bPlay;
+    private Button bSave;
+    private Toolbar toolbar;
 
     boolean recorded;
 
     private androidx.camera.core.VideoCapture videoCapture;
     private ImageCapture imageCapture;
     private String nextAction;
+    private String tempVideoName;
+    private final String SAVED_PATH = android.os.Environment.DIRECTORY_MOVIES + "/saved";
+    private final String TEMP_PATH = android.os.Environment.DIRECTORY_MOVIES + "/temp";
     private ActivityResultLauncher<Intent> launchCheckPin;
 
     @Override
@@ -72,6 +76,7 @@ public class VideoRecorder extends AppCompatActivity implements View.OnClickList
         recorded = false;
 
         setContentView(R.layout.activity_recorder);
+        emptyTempVideos();
 
         previewView = findViewById(R.id.previewView);
         bRecording = findViewById(R.id.bRecord);
@@ -158,6 +163,7 @@ public class VideoRecorder extends AppCompatActivity implements View.OnClickList
                 .requireLensFacing(CameraSelector.LENS_FACING_FRONT)
                 .build();
 
+        previewView.setScaleType(FIT_CENTER);
         Preview preview = new Preview.Builder().build();
         preview.setSurfaceProvider(previewView.getSurfaceProvider());
 
@@ -199,19 +205,19 @@ public class VideoRecorder extends AppCompatActivity implements View.OnClickList
     private void recordVideo() {
         if (videoCapture != null) {
             // Delete previous temp file if it exists
-            //File videoDir = Environment.getExternalStoragePublicDirectory(DIRECTORY_MOVIES);
-            File videoDir = getExternalFilesDir(android.os.Environment.DIRECTORY_MOVIES);
-            File fdelete = new File(videoDir.getPath() + "/tempVideo.mp4");
+            tempVideoName = System.currentTimeMillis() + ".mp4";
+            File videoDir = getExternalFilesDir(TEMP_PATH);
+            File fdelete = new File(videoDir.getPath() + "/" + tempVideoName);
             if (fdelete.exists()) {
                 if (fdelete.delete()) {
-                    Log.v(TAG, "tempVideo.mp4 deleted");
+                    Log.v(TAG, tempVideoName + " deleted");
                 } else {
-                    Log.e(TAG, "Error deleting tempVideo.mp4");
+                    Log.e(TAG, "Error deleting " + tempVideoName);
                 }
             }
 
             ContentValues contentValues = new ContentValues();
-            contentValues.put(MediaStore.MediaColumns.DISPLAY_NAME, "tempVideo");
+            contentValues.put(MediaStore.MediaColumns.DISPLAY_NAME, tempVideoName);
             contentValues.put(MediaStore.MediaColumns.MIME_TYPE, "video/mp4");
 
 
@@ -260,9 +266,9 @@ public class VideoRecorder extends AppCompatActivity implements View.OnClickList
         // Delete video if it already exists
         if (fileOut.exists()) {
             if (fileOut.delete()) {
-                Log.v(TAG, "tempVideo.mp4 deleted");
+                Log.v(TAG, tempVideoName + " deleted");
             } else {
-                Log.e(TAG, "Error deleting tempVideo.mp4");
+                Log.e(TAG, "Error deleting " + tempVideoName);
             }
         }
 
@@ -310,10 +316,11 @@ public class VideoRecorder extends AppCompatActivity implements View.OnClickList
     // For some reason I couldn't save it there directly
     private void moveTempVideoToPrivateStorage() {
         File videoDirIn = Environment.getExternalStoragePublicDirectory(DIRECTORY_MOVIES);
-        File tempVideoIn = new File(videoDirIn.getPath() + "/tempVideo.mp4");
+        File tempVideoIn = new File(videoDirIn.getPath() + "/" + tempVideoName);
 
-        File videoDirOut = getExternalFilesDir(android.os.Environment.DIRECTORY_MOVIES);
-        File tempVideoOut = new File(videoDirOut.getPath() + "/tempVideo.mp4");
+        File videoDirOut = getExternalFilesDir(TEMP_PATH);
+        videoDirOut.mkdirs();
+        File tempVideoOut = new File(videoDirOut.getPath() + "/" + tempVideoName);
 
         while (tempVideoIn.length() == 0) {
             // Wait for file to be written
@@ -323,6 +330,7 @@ public class VideoRecorder extends AppCompatActivity implements View.OnClickList
 
     public void playVideo(View view) {
         Intent playbackIntent = new Intent(view.getContext(), VideoPlayer.class);
+        playbackIntent.putExtra("tempVideoName", tempVideoName);
         startActivity(playbackIntent);
     }
 
@@ -332,13 +340,16 @@ public class VideoRecorder extends AppCompatActivity implements View.OnClickList
     }
 
     public void saveVideo(View view) {
-        File videoDirIn = getExternalFilesDir(android.os.Environment.DIRECTORY_MOVIES);
-        File tempVideoIn = new File(videoDirIn.getPath() + "/tempVideo.mp4");
+        File videoDirIn = getExternalFilesDir(TEMP_PATH);
+        File tempVideoIn = new File(videoDirIn.getPath() + "/" + tempVideoName);
 
-        File videoDirOut = getExternalFilesDir(android.os.Environment.DIRECTORY_MOVIES);
-        File tempVideoOut = new File(videoDirOut.getPath() + "/" + System.currentTimeMillis() + ".mp4");
+        File videoDirOut = getExternalFilesDir(SAVED_PATH);
+        videoDirOut.mkdirs();
+        File tempVideoOut = new File(videoDirOut.getPath() + "/" + tempVideoName);
 
         moveFile(tempVideoIn, tempVideoOut);
+
+        tempVideoName = "";
 
         Toast.makeText(VideoRecorder.this, "Video saved!", Toast.LENGTH_SHORT).show();
         finish();
@@ -346,7 +357,7 @@ public class VideoRecorder extends AppCompatActivity implements View.OnClickList
 
     //Move to public storage to be accessible in gallery
     private void exportVideos() {
-        File directory = getExternalFilesDir(android.os.Environment.DIRECTORY_MOVIES);
+        File directory = getExternalFilesDir(SAVED_PATH);
         File[] files = directory.listFiles();
         Log.d(TAG, "Files: "+ files.length);
 
@@ -357,7 +368,7 @@ public class VideoRecorder extends AppCompatActivity implements View.OnClickList
             String fileName = files[i].getName();
 
             // Don't want to export temporary files, only saved files
-            if (fileName.equals("tempVideo.mp4")) {
+            if (fileName.equals(tempVideoName)) {
                 continue;
             }
 
@@ -374,8 +385,6 @@ public class VideoRecorder extends AppCompatActivity implements View.OnClickList
     }
 
     private void launchCheckPin() {
-
-
         Intent pinIntent = new Intent(this, PinCheck.class);
         launchCheckPin.launch(pinIntent);
     }
@@ -386,13 +395,25 @@ public class VideoRecorder extends AppCompatActivity implements View.OnClickList
     }
 
     private void discardVideo() {
-        File videoDir = getExternalFilesDir(android.os.Environment.DIRECTORY_MOVIES);
-        File tempVideo = new File(videoDir.getPath() + "/tempVideo.mp4");
+        File videoDir = getExternalFilesDir(TEMP_PATH);
+        File tempVideo = new File(videoDir.getPath() + "/" + tempVideoName);
         tempVideo.delete();
 
         Toast.makeText(VideoRecorder.this, "Video discarded", Toast.LENGTH_SHORT).show();
         bRecording.setText("Record");
         bPlay.setVisibility(View.GONE);
         bSave.setVisibility(View.GONE);
+    }
+
+    private void emptyTempVideos() {
+        File directory = getExternalFilesDir(TEMP_PATH);
+        File[] files = directory.listFiles();
+
+        for (int i = 0; i < files.length; i++) {
+            // Only delete if it's not a folder
+            if (files[i].isFile()) {
+                files[i].delete();
+            }
+        }
     }
 }

@@ -10,13 +10,16 @@ import androidx.appcompat.app.AppCompatActivity;
 import java.io.File;
 
 public class VideoPlayer extends AppCompatActivity {
-    VideoView videoView;
-    Button bStop;
+    private VideoView videoView;
+    private Button bStop;
+    private String tempVideoName;
 
     public void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_player);
+
+        tempVideoName = getIntent().getStringExtra("tempVideoName");
 
         videoView = (VideoView)findViewById(R.id.videoView);
         bStop = (Button)findViewById(R.id.bStop);
@@ -28,7 +31,7 @@ public class VideoPlayer extends AppCompatActivity {
     private void playVideo() {
         File videoDir = getExternalFilesDir(android.os.Environment.DIRECTORY_MOVIES);
 
-        videoView.setVideoPath(videoDir.getPath() + "/tempVideo.mp4");
+        videoView.setVideoPath(videoDir.getPath() + "/temp/" + tempVideoName);
         //videoView.setMediaController(new MediaController(this, ));
         videoView.requestFocus();
         videoView.start();
