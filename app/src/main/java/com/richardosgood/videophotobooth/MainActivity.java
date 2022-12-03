@@ -15,8 +15,11 @@ import android.widget.Toast;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.security.KeyStore;
 import java.util.ArrayList;
+import java.util.Random;
 
 public class MainActivity extends Activity {
     public static final String TAG = "VideoPhotoBooth";
@@ -26,6 +29,7 @@ public class MainActivity extends Activity {
     private KeyStore keyStore;
     private static SharedPreferences prefs;
     public static DataEncryptor dataEncryptor;
+    private static String iv = null;
 
     private static final int CAMERA_REQUEST = 1888;
     ImageView imageView;
@@ -53,19 +57,55 @@ public class MainActivity extends Activity {
             finish();
         }
 
+        // retrieve the random IV from app preferences. It's used along with a key to encrypt/decrypt the video export PIN
+        iv = prefs.getString("IV", null);
+        if (iv == null) {
+            // IV doesn't exist, so randomly generate one
+            iv = generateIv();
+        }
+
+
+        // Retrieve the encrypted PIN from app preferences
         String pin = prefs.getString("PIN", null);
-        //pin = null;
         if (pin == null) {
             // No PIN is set, so require a PIN to be set
             Toast.makeText(MainActivity.this, getString(R.string.main_pin_choose), Toast.LENGTH_SHORT).show();
-            setPin();
+            setPin(iv);
         }
 
     }
 
-    private void setPin() {
+    private void setPin(String iv) {
         Intent pinIntent = new Intent(this, PinReset.class);
         startActivity(pinIntent);
+    }
+
+    public static boolean savePin(String pin) {
+        String encryptedPin = dataEncryptor.encryptData(pin.getBytes(), iv);
+        if (encryptedPin.equals(null)){
+            return false;
+        }
+        prefs.edit().putString("PIN", encryptedPin).commit();
+        return true;
+    }
+
+    private String generateIv() {
+        int leftLimit = 33; // letter 'a'
+        int rightLimit = 126; // letter 'z'
+        int targetStringLength = 12;
+
+        Random random = new Random();
+        StringBuilder buffer = new StringBuilder(targetStringLength);
+
+        for (int i = 0; i < targetStringLength; i++) {
+            int randomLimitedInt = leftLimit + (int)
+                    (random.nextFloat() * (rightLimit - leftLimit + 1));
+            buffer.append((char) randomLimitedInt);
+        }
+        String iv = buffer.toString();
+
+        prefs.edit().putString("IV", iv).commit();
+        return iv;
     }
 
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -80,18 +120,9 @@ public class MainActivity extends Activity {
         startActivity(cameraIntent);
     }
 
-    public static boolean savePin(String pin) {
-        String encryptedPin = dataEncryptor.encryptData(pin.getBytes());
-        if (encryptedPin.equals(null)){
-            return false;
-        }
-        prefs.edit().putString("PIN", encryptedPin).commit();
-        return true;
-    }
-
     public static boolean checkPin(String enteredPin) throws Exception {
         String storedPin_encrypted = prefs.getString("PIN", null);
-        String storedPin = dataEncryptor.decryptData(storedPin_encrypted);
+        String storedPin = dataEncryptor.decryptData(storedPin_encrypted, iv);
         if (storedPin.equals(enteredPin)) {
             return true;
         }

@@ -24,7 +24,6 @@ public class DataEncryptor {
     private static final String AndroidKeyStore = "AndroidKeyStore";
     private static final String AES_MODE = "AES/GCM/NoPadding";
     private static final String KEY_ALIAS = "VideoBoothKey";
-    private static String FIXED_IV = "123456789012";
     private KeyStore keyStore;
 
     public DataEncryptor() {
@@ -82,27 +81,27 @@ public class DataEncryptor {
         return keyStore.getKey(KEY_ALIAS, null);
     }
 
-    public String encryptData(byte[] input) {
+    public String encryptData(byte[] input, String iv) {
         String encryptedBase64Encoded = null;
 
         try {
             Cipher c = Cipher.getInstance(AES_MODE);
-            c.init(Cipher.ENCRYPT_MODE, getSecretKey(), new GCMParameterSpec(128, FIXED_IV.getBytes()));
+            c.init(Cipher.ENCRYPT_MODE, getSecretKey(), new GCMParameterSpec(128, iv.getBytes()));
             byte[] encodedBytes = c.doFinal(input);
             encryptedBase64Encoded = Base64.encodeToString(encodedBytes, Base64.DEFAULT);
         } catch (Exception e) {
-            Log.e(TAG, Resources.getSystem().getString(R.string.error_enc_encrypt));
+            Log.e(TAG, "Error encrypting pin: " + e.getMessage());
         }
         return encryptedBase64Encoded;
     }
 
-    public String decryptData(String encryptedBase64Encoded) {
+    public String decryptData(String encryptedBase64Encoded, String iv) {
         String decoded = null;
         byte[] encrypted = Base64.decode(encryptedBase64Encoded, Base64.DEFAULT);
 
         try {
             Cipher c = Cipher.getInstance(AES_MODE);
-            c.init(Cipher.DECRYPT_MODE, getSecretKey(), new GCMParameterSpec(128, FIXED_IV.getBytes()));
+            c.init(Cipher.DECRYPT_MODE, getSecretKey(), new GCMParameterSpec(128, iv.getBytes()));
             byte[] decodedBytes = c.doFinal(encrypted);
             decoded = new String(decodedBytes);
         } catch (Exception e) {
