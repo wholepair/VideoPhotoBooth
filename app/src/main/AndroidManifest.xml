@@ -20,6 +20,7 @@
 
         <activity
             android:name=".MainActivity"
+            android:screenOrientation="portrait"
             android:exported="true" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -31,13 +32,21 @@
                 android:name="android.app.lib_name"
                 android:value="" />
         </activity>
-        <activity android:name=".VideoRecorder" >
+        <activity
+            android:name=".VideoRecorder"
+            android:screenOrientation="portrait">
         </activity>
-        <activity android:name=".VideoPlayer" >
+        <activity
+            android:name=".VideoPlayer"
+            android:screenOrientation="portrait">
         </activity>
-        <activity android:name=".PinCheck" >
+        <activity
+            android:name=".PinCheck"
+            android:screenOrientation="portrait">
         </activity>
-        <activity android:name=".PinReset" >
+        <activity
+            android:name=".PinReset"
+            android:screenOrientation="portrait">
         </activity>
     </application>
 
