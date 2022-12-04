@@ -24,4 +24,15 @@
         app:layout_constraintEnd_toEndOf="@+id/editTextPin"
         app:layout_constraintStart_toStartOf="@+id/editTextPin"
         app:layout_constraintTop_toBottomOf="@+id/editTextPin" />
+
+    <Button
+        android:id="@+id/bSubmit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="19dp"
+        android:onClick="validatePin"
+        android:text="Submit"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView" />
 </androidx.constraintlayout.widget.ConstraintLayout>

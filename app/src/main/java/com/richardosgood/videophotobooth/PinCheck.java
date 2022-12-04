@@ -30,30 +30,34 @@ public class PinCheck extends Activity {
                         (keyCode == KeyEvent.KEYCODE_ENTER)) {
 
                     // Perform action on key press
-                    String enteredPin = editTextPin.getText().toString();
-                    boolean result = false;
-
-                    try {
-                        result = checkPin(enteredPin);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        Toast.makeText(PinCheck.this, getString(R.string.error_pin_validate), Toast.LENGTH_SHORT).show();
-                        returnFalse();
-                        finish();
-                    }
-
-                    if (result == false) {
-                        Toast.makeText(PinCheck.this, getString(R.string.pin_incorrect), Toast.LENGTH_SHORT).show();
-                        editTextPin.setText("");
-                    } else {
-                        returnTrue();
-                        finish();
-                    }
+                    validatePin(v);
                     return true;
                 }
                 return false;
             }
         });
+    }
+
+    public void validatePin(View v) {
+        String enteredPin = editTextPin.getText().toString();
+        boolean result = false;
+
+        try {
+            result = checkPin(enteredPin);
+        } catch (Exception e) {
+            e.printStackTrace();
+            Toast.makeText(PinCheck.this, getString(R.string.error_pin_validate), Toast.LENGTH_SHORT).show();
+            returnFalse();
+            finish();
+        }
+
+        if (result == false) {
+            Toast.makeText(PinCheck.this, getString(R.string.pin_incorrect), Toast.LENGTH_SHORT).show();
+            editTextPin.setText("");
+        } else {
+            returnTrue();
+            finish();
+        }
     }
 
     private void returnTrue() {

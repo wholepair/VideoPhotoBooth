@@ -12,6 +12,11 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
@@ -108,7 +113,10 @@ public class MainActivity extends Activity {
         return iv;
     }
 
+    @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
         if (requestCode == CAMERA_REQUEST) {
             Bitmap photo = (Bitmap) data.getExtras().get("data");
             imageView.setImageBitmap(photo);
@@ -116,8 +124,9 @@ public class MainActivity extends Activity {
     }
 
     public void screenTapped(View view) {
-        Intent cameraIntent = new Intent(view.getContext(), VideoRecorder.class);
-        startActivity(cameraIntent);
+        // For obtaining the user's first and last name later
+        Intent enterNameIntent = new Intent(this, EnterName.class);
+        startActivity(enterNameIntent);
     }
 
     public static boolean checkPin(String enteredPin) throws Exception {

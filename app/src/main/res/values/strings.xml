@@ -9,4 +9,5 @@
     <string name="pin_updated">PIN updated</string>
     <string name="pin_incorrect">Incorrect PIN</string>
     <string name="pin_nomatch">PINs do not match!</string>
+    <string name="name_alpha_numeric">Please use only letters, numbers, or spaces</string>
 </resources>

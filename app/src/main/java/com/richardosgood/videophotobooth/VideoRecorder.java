@@ -75,6 +75,8 @@ public class VideoRecorder extends AppCompatActivity implements View.OnClickList
         super.onCreate(savedInstanceState);
         recorded = false;
 
+        tempVideoName = getIntent().getStringExtra("personName");
+
         setContentView(R.layout.activity_recorder);
         emptyTempVideos();
 
@@ -94,6 +96,7 @@ public class VideoRecorder extends AppCompatActivity implements View.OnClickList
         toolbar.setSubtitle("Video Booth");
         toolbar.inflateMenu(R.menu.options_menu);
 
+        // For checking the user's PIN later
         launchCheckPin = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
                 new ActivityResultCallback<ActivityResult>() {
@@ -118,9 +121,6 @@ public class VideoRecorder extends AppCompatActivity implements View.OnClickList
         toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
-                // TODO: Authenticate with PIN
-
-
                 if (item.getItemId() == R.id.export) {
                     nextAction = "export";
                     launchCheckPin();
@@ -204,8 +204,15 @@ public class VideoRecorder extends AppCompatActivity implements View.OnClickList
     @SuppressLint("RestrictedApi")
     private void recordVideo() {
         if (videoCapture != null) {
+            // If the person didn't enter a name
+            if (tempVideoName.equals("")) {
+                tempVideoName = System.currentTimeMillis() + ".mp4";
+            } else {
+                // Add timestamp to prevent duplicate filenames
+                tempVideoName += "_" + System.currentTimeMillis() + ".mp4";
+            }
+
             // Delete previous temp file if it exists
-            tempVideoName = System.currentTimeMillis() + ".mp4";
             File videoDir = getExternalFilesDir(TEMP_PATH);
             File fdelete = new File(videoDir.getPath() + "/" + tempVideoName);
             if (fdelete.exists()) {
@@ -337,6 +344,8 @@ public class VideoRecorder extends AppCompatActivity implements View.OnClickList
         finish();
     }
 
+    private void updateVideoFilename(String personName) {}
+
     //Move to public storage to be accessible in gallery
     private void exportVideos() {
         File directory = getExternalFilesDir(SAVED_PATH);
@@ -366,6 +375,7 @@ public class VideoRecorder extends AppCompatActivity implements View.OnClickList
         Toast.makeText(VideoRecorder.this, "Exported " + fileCount + " videos to gallery", Toast.LENGTH_SHORT).show();
     }
 
+    // Launch activity to check pin
     private void launchCheckPin() {
         Intent pinIntent = new Intent(this, PinCheck.class);
         launchCheckPin.launch(pinIntent);
