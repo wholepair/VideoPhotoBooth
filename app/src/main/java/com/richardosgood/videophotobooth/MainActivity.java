@@ -169,9 +169,10 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        Log.v(TAG, "PREFERENCE CHANGED");
         loadPreferences();
 
-        if (sharedPreferences.getBoolean("backgroundChanged", true)) {
+        if (key.equals("backgroundChanged")) {
             sharedPreferences.edit().putBoolean("backgroundChanged", false).commit();
             refreshBackgroundImage();
         }
