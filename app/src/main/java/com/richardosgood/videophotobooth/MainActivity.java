@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -17,6 +18,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.preference.PreferenceManager;
 
+import java.io.File;
 import java.security.KeyStore;
 import java.util.ArrayList;
 import java.util.Random;
@@ -30,9 +32,10 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
     private static SharedPreferences prefs;
     public static DataEncryptor dataEncryptor;
     private static String iv = null;
+    private final String BACKGROUND_PATH = android.os.Environment.DIRECTORY_PICTURES;
 
     private static final int CAMERA_REQUEST = 1888;
-    private ImageView imageView;
+    private ImageView backgroundImage;
     private TextView tvHomeScreenInstructions;
     MainActivity ThisActivity = this;
 
@@ -41,9 +44,13 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
         setContentView(R.layout.activity_main);
 
         tvHomeScreenInstructions = findViewById(R.id.homeScreenInstructions);
+        backgroundImage = findViewById(R.id.ivBackground);
+
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
         sharedPreferences.registerOnSharedPreferenceChangeListener(this);
+        sharedPreferences.edit().putBoolean("backgroundChanged", false).commit();
         loadPreferences();
+        refreshBackgroundImage();
 
         checkPermissions();
 
@@ -81,8 +88,6 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
 
     }
 
-
-
     private void setPin(String iv) {
         Intent pinIntent = new Intent(this, PinReset.class);
         startActivity(pinIntent);
@@ -114,16 +119,6 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
 
         prefs.edit().putString("IV", iv).commit();
         return iv;
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        if (requestCode == CAMERA_REQUEST) {
-            Bitmap photo = (Bitmap) data.getExtras().get("data");
-            imageView.setImageBitmap(photo);
-        }
     }
 
     public void screenTapped(View view) {
@@ -174,14 +169,45 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        if (key.equals("homeScreenText")){
-            tvHomeScreenInstructions.setText(sharedPreferences.getString(key, null));
+        loadPreferences();
+
+        if (sharedPreferences.getBoolean("backgroundChanged", true)) {
+            sharedPreferences.edit().putBoolean("backgroundChanged", false).commit();
+            refreshBackgroundImage();
         }
     }
 
     private void loadPreferences() {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
+
+        // Home screen text
         String homeScreenText = sharedPreferences.getString("homeScreenText", null);
         tvHomeScreenInstructions.setText(homeScreenText);
+
+        // Home image
+        if (sharedPreferences.getBoolean("swHomeScreenBackground", false)) {
+            backgroundImage.setVisibility(View.GONE);
+        } else {
+            backgroundImage.setVisibility(View.VISIBLE);
+        }
+    }
+
+    public void refreshBackgroundImage() {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        if (sharedPreferences.getBoolean("swHomeScreenBackground", false)) {
+            File backgroundFileDir = getExternalFilesDir(BACKGROUND_PATH);
+            File backgroundFile = new File(backgroundFileDir.getPath() + "/background");
+            if (backgroundFile.exists()) {
+                try {
+                    Log.v(TAG, "Setting background image");
+                    backgroundImage.setImageURI(Uri.parse(backgroundFile.getPath()));
+                    backgroundImage.setVisibility(View.VISIBLE);
+                } catch (Exception e) {
+                    Toast.makeText(MainActivity.this, "Unable to load background image!", Toast.LENGTH_SHORT).show();
+                    Log.e(TAG, e.getMessage());
+                    backgroundImage.setImageURI(null);
+                }
+            }
+        }
     }
 }

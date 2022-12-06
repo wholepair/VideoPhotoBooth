@@ -9,6 +9,15 @@
             app:defaultValue="@string/home_instructions_default"
             app:useSimpleSummaryProvider="true" />
 
+        <SwitchPreference
+            android:defaultValue="false"
+            android:key="swHomeScreenBackground"
+            android:title="Enable home screen image" />
+
+        <Preference
+            android:title="Home screen image"
+            android:key="filePicker" />
+
         <EditTextPreference
             app:key="enterNameText"
             app:title="@string/enter_name_text"
