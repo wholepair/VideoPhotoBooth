@@ -4,5 +4,7 @@
           android:title="Export Videos" />
     <item android:id="@+id/setPin"
         android:title="Set PIN" />
+    <item android:id="@+id/settings"
+        android:title="Settings" />
 
 </menu>

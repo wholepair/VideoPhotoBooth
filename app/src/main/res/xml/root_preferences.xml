@@ -1,0 +1,33 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <PreferenceCategory app:title="@string/settings_header">
+
+        <EditTextPreference
+            app:key="homeScreenText"
+            app:title="@string/home_screen_text"
+            app:defaultValue="@string/home_instructions_default"
+            app:useSimpleSummaryProvider="true" />
+
+        <EditTextPreference
+            app:key="enterNameText"
+            app:title="@string/enter_name_text"
+            app:defaultValue="@string/name_instructions_default"
+            app:useSimpleSummaryProvider="true" />
+
+        <SwitchPreference
+            android:defaultValue="true"
+            android:key="swEnableInstructions"
+            android:title="Enable instructions screen" />
+
+        <EditTextPreference
+            app:key="recordInstructionsText"
+            app:title="@string/record_instructions_text"
+            android:defaultValue="@string/record_instructions_default"
+            app:useSimpleSummaryProvider="true" />
+
+    </PreferenceCategory>
+
+
+
+</PreferenceScreen>

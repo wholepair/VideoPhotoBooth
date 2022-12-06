@@ -1,15 +1,20 @@
 package com.richardosgood.videophotobooth;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.preference.PreferenceManager;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
-public class EnterName extends AppCompatActivity {
+public class EnterName extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
     private EditText etName;
+    private TextView tvEnterNameInstructions;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -17,6 +22,9 @@ public class EnterName extends AppCompatActivity {
         setContentView(R.layout.activity_enter_name);
 
         etName = findViewById(R.id.etPersonName);
+        tvEnterNameInstructions = findViewById(R.id.tvEnterNameInstructions);
+
+        loadPreferences();
     }
 
     // Called when user submits their name in the activity
@@ -43,11 +51,40 @@ public class EnterName extends AppCompatActivity {
     }
 
     private void returnToRecorder(String name) {
-        Intent intent = new Intent(this, VideoRecorder.class);
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        boolean instructionsEnabled = sharedPreferences.getBoolean("swEnableInstructions", true);
+
+        Intent intent;
+
+        if (instructionsEnabled) {
+            intent = new Intent(this, InstructionsActivity.class);
+        } else {
+            intent = new Intent(this, VideoRecorder.class);
+        }
+
         intent.putExtra("personName", name);
         startActivity(intent);
         setResult(RESULT_OK, intent);
         finish();
     }
 
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        if (key.equals("enterNameText")){
+            tvEnterNameInstructions.setText(sharedPreferences.getString(key, null));
+        }
+    }
+
+    private void loadPreferences() {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        String text = sharedPreferences.getString("enterNameText", null);
+        tvEnterNameInstructions.setText(text);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        sharedPreferences.unregisterOnSharedPreferenceChangeListener(this);
+    }
 }

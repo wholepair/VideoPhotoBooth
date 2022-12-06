@@ -10,23 +10,18 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.activity.result.ActivityResult;
-import androidx.activity.result.ActivityResultCallback;
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.preference.PreferenceManager;
 
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.security.KeyStore;
 import java.util.ArrayList;
 import java.util.Random;
 
-public class MainActivity extends Activity {
+public class MainActivity extends Activity implements SharedPreferences.OnSharedPreferenceChangeListener {
     public static final String TAG = "VideoPhotoBooth";
     private static final String AndroidKeyStore = "AndroidKeyStore";
     private static final String AES_MODE = "AES/GCM/NoPadding";
@@ -37,12 +32,18 @@ public class MainActivity extends Activity {
     private static String iv = null;
 
     private static final int CAMERA_REQUEST = 1888;
-    ImageView imageView;
+    private ImageView imageView;
+    private TextView tvHomeScreenInstructions;
     MainActivity ThisActivity = this;
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        tvHomeScreenInstructions = findViewById(R.id.homeScreenInstructions);
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
+        sharedPreferences.registerOnSharedPreferenceChangeListener(this);
+        loadPreferences();
 
         checkPermissions();
 
@@ -79,6 +80,8 @@ public class MainActivity extends Activity {
         }
 
     }
+
+
 
     private void setPin(String iv) {
         Intent pinIntent = new Intent(this, PinReset.class);
@@ -160,5 +163,25 @@ public class MainActivity extends Activity {
             perms.toArray(permArray);
             ActivityCompat.requestPermissions(this, permArray, 100);
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
+        sharedPreferences.unregisterOnSharedPreferenceChangeListener(this);
+    }
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        if (key.equals("homeScreenText")){
+            tvHomeScreenInstructions.setText(sharedPreferences.getString(key, null));
+        }
+    }
+
+    private void loadPreferences() {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
+        String homeScreenText = sharedPreferences.getString("homeScreenText", null);
+        tvHomeScreenInstructions.setText(homeScreenText);
     }
 }

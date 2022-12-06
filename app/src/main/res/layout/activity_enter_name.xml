@@ -35,15 +35,15 @@
         app:layout_constraintTop_toBottomOf="@+id/etPersonName" />
 
     <TextView
-        android:id="@+id/textView4"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="27dp"
-        android:layout_marginTop="211dp"
-        android:layout_marginBottom="41dp"
+        android:id="@+id/tvEnterNameInstructions"
+        android:layout_width="0dp"
+        android:layout_height="91dp"
+        android:layout_marginStart="43dp"
+        android:layout_marginTop="148dp"
+        android:layout_marginEnd="43dp"
         android:text="Please enter your first and last name below"
-        app:layout_constraintBottom_toTopOf="@+id/etPersonName"
-        app:layout_constraintStart_toStartOf="@+id/etPersonName"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <Button

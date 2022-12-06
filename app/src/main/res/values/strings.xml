@@ -9,5 +9,15 @@
     <string name="pin_updated">PIN updated</string>
     <string name="pin_incorrect">Incorrect PIN</string>
     <string name="pin_nomatch">PINs do not match!</string>
+    <string name="home_instructions_default"></string>
     <string name="name_alpha_numeric">Please use only letters, numbers, or spaces</string>
+    <string name="name_instructions_default">Please enter your first and last name</string>
+    <string name="title_activity_settings">SettingsActivity</string>
+
+    <!-- Preferences -->
+    <string name="settings_header">Settings</string>
+    <string name="home_screen_text">Home screen text</string>
+    <string name="enter_name_text">Enter name instructions</string>
+    <string name="record_instructions_text">Video recording instructions</string>
+    <string name="record_instructions_default">Please state your name at the begining of the video and tell a relevant story or anecdote.</string>
 </resources>

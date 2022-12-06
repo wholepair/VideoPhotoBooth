@@ -111,6 +111,8 @@ public class VideoRecorder extends AppCompatActivity implements View.OnClickList
                                     exportVideos();
                                 } else if (nextAction == "resetPin") {
                                     setPin();
+                                } else if (nextAction == "settings") {
+                                    launchSettingsActivity();
                                 }
                             }
 
@@ -126,6 +128,9 @@ public class VideoRecorder extends AppCompatActivity implements View.OnClickList
                     launchCheckPin();
                 } else if (item.getItemId() == R.id.setPin) {
                     nextAction = "resetPin";
+                    launchCheckPin();
+                } else if (item.getItemId() == R.id.settings) {
+                    nextAction = "settings";
                     launchCheckPin();
                 } else {
                     // do something
@@ -407,5 +412,10 @@ public class VideoRecorder extends AppCompatActivity implements View.OnClickList
                 files[i].delete();
             }
         }
+    }
+
+    private void launchSettingsActivity() {
+        Intent settingsIntent = new Intent(this, SettingsActivity.class);
+        startActivity(settingsIntent);
     }
 }
