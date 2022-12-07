@@ -12,6 +12,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.camera.core.AspectRatio;
 import androidx.camera.core.CameraSelector;
 import androidx.camera.core.ImageCapture;
 import androidx.camera.core.Preview;
@@ -169,12 +170,12 @@ public class VideoRecorder extends AppCompatActivity implements View.OnClickList
                 .build();
 
         previewView.setScaleType(FIT_CENTER);
-        Preview preview = new Preview.Builder().build();
+        Preview preview = new Preview.Builder().setTargetAspectRatio(AspectRatio.RATIO_16_9).build();
         preview.setSurfaceProvider(previewView.getSurfaceProvider());
 
         videoCapture = new VideoCapture.Builder()
                 .setVideoFrameRate(30)
-                .build();
+                .build();`
         imageCapture = new ImageCapture.Builder()
                 .setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY)
                 .build();
@@ -227,11 +228,11 @@ public class VideoRecorder extends AppCompatActivity implements View.OnClickList
                     Log.e(TAG, "Error deleting " + tempVideoName);
                 }
             }
-
+/*
             ContentValues contentValues = new ContentValues();
             contentValues.put(MediaStore.MediaColumns.DISPLAY_NAME, tempVideoName);
             contentValues.put(MediaStore.MediaColumns.MIME_TYPE, "video/mp4");
-
+*/
 
 
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
