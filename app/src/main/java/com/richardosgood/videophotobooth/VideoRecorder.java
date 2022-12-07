@@ -175,7 +175,7 @@ public class VideoRecorder extends AppCompatActivity implements View.OnClickList
 
         videoCapture = new VideoCapture.Builder()
                 .setVideoFrameRate(30)
-                .build();`
+                .build();
         imageCapture = new ImageCapture.Builder()
                 .setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY)
                 .build();
