@@ -9,15 +9,15 @@
     <string name="pin_updated">PIN updated</string>
     <string name="pin_incorrect">Incorrect PIN</string>
     <string name="pin_nomatch">PINs do not match!</string>
-    <string name="home_instructions_default"></string>
+    <string name="home_instructions_default">Kevin initiated the building of this VideoBooth with his robotics friends. Here is what he said, "I'm hoping that when the day comes and all my friends come to congregate at my funeral, they could record a short story (or long one) about me, how we knew each other, sharing interesting anecdotes etc. So when my kids are older they can watch these video testimonials and get a sense of who I was as a person."</string>
     <string name="name_alpha_numeric">Please use only letters, numbers, or spaces</string>
-    <string name="name_instructions_default">Please enter your first and last name</string>
+    <string name="name_instructions_default">Enter your name below. First and last, or just first. These names will be appended to the video file name saved for Kevin\'s family. Please state your name in the recording as well. In could help future-proof the stories we are collecting.</string>
     <string name="title_activity_settings">SettingsActivity</string>
 
     <!-- Preferences -->
     <string name="settings_header">Settings</string>
-    <string name="home_screen_text">Home screen text</string>
+    <string name="home_screen_text">Home screen instructions</string>
     <string name="enter_name_text">Enter name instructions</string>
     <string name="record_instructions_text">Video recording instructions</string>
-    <string name="record_instructions_default">Please state your name at the begining of the video and tell a relevant story or anecdote.</string>
+    <string name="record_instructions_default">Please state your name at the beginning of the video and tell a relevant story or anecdote.</string>
 </resources>

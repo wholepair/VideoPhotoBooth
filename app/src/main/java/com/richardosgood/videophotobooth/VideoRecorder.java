@@ -21,6 +21,7 @@ import androidx.camera.lifecycle.ProcessCameraProvider;
 import androidx.camera.view.PreviewView;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.preference.PreferenceManager;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
@@ -28,6 +29,7 @@ import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.media.MediaScannerConnection;
 import android.os.Bundle;
@@ -37,6 +39,7 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.common.util.concurrent.ListenableFuture;
@@ -50,7 +53,7 @@ import java.io.OutputStream;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 
-public class VideoRecorder extends AppCompatActivity implements View.OnClickListener {
+public class VideoRecorder extends AppCompatActivity implements View.OnClickListener, SharedPreferences.OnSharedPreferenceChangeListener {
     private static final String TAG = "VideoPhotoBooth";
 
     private ListenableFuture<ProcessCameraProvider> cameraProviderFuture;
@@ -60,6 +63,7 @@ public class VideoRecorder extends AppCompatActivity implements View.OnClickList
     private Button bPlay;
     private Button bSave;
     private Toolbar toolbar;
+    private TextView tvInstructions;
 
     boolean recorded;
 
@@ -70,6 +74,7 @@ public class VideoRecorder extends AppCompatActivity implements View.OnClickList
     private final String SAVED_PATH = android.os.Environment.DIRECTORY_MOVIES + "/saved";
     private final String TEMP_PATH = android.os.Environment.DIRECTORY_MOVIES + "/temp";
     private ActivityResultLauncher<Intent> launchCheckPin;
+    private SharedPreferences sharedPreferences;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -88,6 +93,7 @@ public class VideoRecorder extends AppCompatActivity implements View.OnClickList
         bPlay = findViewById(R.id.bPlay);
         bSave = findViewById(R.id.bSave);
         toolbar = (Toolbar)findViewById(R.id.toolbar);
+        tvInstructions = (TextView)findViewById(R.id.tvRecordInstructions);
 
         // Hide these buttons until a video has been recorded
         bPlay.setVisibility(View.GONE);
@@ -96,6 +102,10 @@ public class VideoRecorder extends AppCompatActivity implements View.OnClickList
         //setSupportActionBar(toolbar);
         toolbar.setSubtitle("Video Booth");
         toolbar.inflateMenu(R.menu.options_menu);
+
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        sharedPreferences.registerOnSharedPreferenceChangeListener(this);
+        processInstructionsPreference(sharedPreferences);
 
         // For checking the user's PIN later
         launchCheckPin = registerForActivityResult(
@@ -154,6 +164,32 @@ public class VideoRecorder extends AppCompatActivity implements View.OnClickList
 
         }, getExecutor());
 
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        sharedPreferences.unregisterOnSharedPreferenceChangeListener(this);
+    }
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        if (key.equals("swInstructionsOnRecorder")) {
+            processInstructionsPreference(sharedPreferences);
+        }
+    }
+
+    private void processInstructionsPreference(SharedPreferences sharedPreferences) {
+        Log.v(TAG, "processInstructionsPreferences");
+        if (sharedPreferences.getBoolean("swInstructionsOnRecorder", false)) {
+            String instructions = sharedPreferences.getString("recordInstructionsText", "test");
+            Log.v(TAG, "Instructions: " + instructions);
+            tvInstructions.setVisibility(View.VISIBLE);
+            tvInstructions.setText(instructions);
+        } else {
+            tvInstructions.setVisibility(View.GONE);
+        }
     }
 
     private Executor getExecutor() {
