@@ -8,8 +8,8 @@
 
     <EditText
         android:id="@+id/etPersonName"
-        android:layout_width="273dp"
-        android:layout_height="40dp"
+        android:layout_width="446dp"
+        android:layout_height="41dp"
         android:layout_marginTop="20dp"
         android:layout_marginBottom="10dp"
         android:ems="15"
@@ -35,12 +35,13 @@
 
     <TextView
         android:id="@+id/tvEnterNameInstructions"
-        android:layout_width="290dp"
-        android:layout_height="0dp"
+        android:layout_width="445dp"
+        android:layout_height="134dp"
         android:layout_marginTop="170dp"
         android:layout_marginBottom="20dp"
+        android:textAlignment="gravity"
+        android:textSize="20dp"
         android:text="Please enter your first and last name below"
-        android:textAlignment="center"
         app:layout_constraintBottom_toTopOf="@+id/etPersonName"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -50,8 +51,8 @@
         android:id="@+id/bSkip"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="150dp"
-        android:layout_marginBottom="17dp"
+        android:layout_marginTop="125dp"
+        android:layout_marginBottom="100dp"
         android:onClick="skipName"
         android:text="Skip"
         app:layout_constraintBottom_toBottomOf="parent"

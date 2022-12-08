@@ -3,37 +3,45 @@
 
     <PreferenceCategory app:title="@string/settings_header">
 
-        <EditTextPreference
-            app:key="homeScreenText"
-            app:title="@string/home_screen_text"
-            app:defaultValue="@string/home_instructions_default"
-            app:useSimpleSummaryProvider="true" />
+        <PreferenceCategory android:title="Home Screen Settings">
+            <EditTextPreference
+                app:key="homeScreenText"
+                app:title="@string/home_screen_text"
+                app:defaultValue="@string/home_instructions_default"
+                app:useSimpleSummaryProvider="true" />
 
-        <SwitchPreference
-            android:defaultValue="false"
-            android:key="swHomeScreenBackground"
-            android:title="Enable home screen image" />
+            <SwitchPreference
+                android:defaultValue="false"
+                android:key="swHomeScreenBackground"
+                android:title="Enable home screen image" />
 
-        <Preference
-            android:title="Home screen image"
-            android:key="filePicker" />
+            <Preference
+                android:title="Choose screen image"
+                android:key="filePicker" />
+        </PreferenceCategory>
 
-        <EditTextPreference
-            app:key="enterNameText"
-            app:title="@string/enter_name_text"
-            app:defaultValue="@string/name_instructions_default"
-            app:useSimpleSummaryProvider="true" />
+        <PreferenceCategory android:title="Instructions Settings">
+            <EditTextPreference
+                app:key="enterNameText"
+                app:title="@string/enter_name_text"
+                app:defaultValue="@string/name_instructions_default"
+                app:useSimpleSummaryProvider="true" />
 
-        <SwitchPreference
-            android:defaultValue="true"
-            android:key="swEnableInstructions"
-            android:title="Enable instructions screen" />
+            <SwitchPreference
+                android:defaultValue="false"
+                android:key="swEnableInstructions"
+                android:title="Enable instructions screen" />
 
-        <EditTextPreference
-            app:key="recordInstructionsText"
-            app:title="@string/record_instructions_text"
-            android:defaultValue="@string/record_instructions_default"
-            app:useSimpleSummaryProvider="true" />
+            <SwitchPreference
+                android:defaultValue="true"
+                android:key="swInstructionsOnRecorder"
+                android:title="Show instructions on recording screen" />
+            <EditTextPreference
+                app:key="recordInstructionsText"
+                app:title="@string/record_instructions_text"
+                android:defaultValue="@string/record_instructions_default"
+                app:useSimpleSummaryProvider="true" />
+        </PreferenceCategory>
 
     </PreferenceCategory>
 
